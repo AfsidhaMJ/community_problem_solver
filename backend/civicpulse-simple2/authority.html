@@ -1,0 +1,1332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CivicPulse — Authority Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #f4f8f4;
+  --surface:  #ffffff;
+  --surface2: #eaf3ea;
+  --border:   #cde3cd;
+  --green:    #2e7d32;
+  --green2:   #388e3c;
+  --green3:   #1b5e20;
+  --text:     #0d1a0d;
+  --muted:    #4a6b4a;
+  --red:      #c62828;
+  --amber:    #e65100;
+  --blue:     #1565c0;
+  --sidebar:  260px;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* ── LOGIN SCREEN ─────────────────────────────────────────────────────────── */
+#login-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, #e8f5e8 0%, #f0f9f0 50%, #e0f2e0 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+#login-screen::before {
+  content: '';
+  position: absolute;
+  width: 600px; height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(46,125,50,0.08) 0%, transparent 70%);
+  top: -200px; right: -200px;
+  pointer-events: none;
+}
+
+#login-screen::after {
+  content: '';
+  position: absolute;
+  width: 400px; height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(27,94,32,0.06) 0%, transparent 70%);
+  bottom: -100px; left: -100px;
+  pointer-events: none;
+}
+
+.login-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 48px 44px;
+  width: 420px;
+  box-shadow: 0 20px 60px rgba(46,125,50,0.12), 0 4px 16px rgba(0,0,0,0.06);
+  position: relative;
+  z-index: 1;
+  animation: slideUp 0.35s ease;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.login-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 30px;
+  padding: 6px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--green3);
+  margin-bottom: 24px;
+}
+
+.login-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.login-sub {
+  font-size: 14px;
+  color: var(--muted);
+  margin-bottom: 32px;
+  line-height: 1.5;
+}
+
+.field-group {
+  margin-bottom: 18px;
+}
+
+.field-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 7px;
+}
+
+.field-group input {
+  width: 100%;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.field-group input:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(46,125,50,0.1);
+}
+
+.login-btn {
+  width: 100%;
+  padding: 13px;
+  background: var(--green);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Syne', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: background 0.15s, transform 0.1s;
+  margin-top: 8px;
+}
+
+.login-btn:hover  { background: var(--green3); }
+.login-btn:active { transform: scale(0.98); }
+
+.login-error {
+  display: none;
+  background: #fdecea;
+  border: 1px solid #ef9a9a;
+  color: var(--red);
+  border-radius: 9px;
+  padding: 10px 14px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.login-hint {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.hint-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 12px;
+  margin-top: 8px;
+}
+
+.hint-row { font-size: 12px; color: var(--muted); }
+.hint-row strong { color: var(--text); }
+
+/* ── PORTAL (post-login) ──────────────────────────────────────────────────── */
+#portal { display: none; }
+
+.sidebar {
+  width: var(--sidebar);
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+}
+
+.logo-wrap {
+  padding: 26px 22px 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.logo-mark {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text);
+}
+
+.logo-mark span { color: var(--green); }
+
+.logo-tag {
+  display: inline-block;
+  margin-top: 5px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--green3);
+}
+
+.auth-info {
+  margin: 16px 14px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+.auth-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.auth-dept { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+nav.portal-nav {
+  flex: 1;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 13.5px;
+  font-weight: 400;
+  transition: all 0.15s;
+  border: 1px solid transparent;
+}
+
+.nav-item:hover { background: var(--surface2); color: var(--text); }
+
+.nav-item.active {
+  background: var(--surface2);
+  color: var(--text);
+  font-weight: 600;
+  border-color: var(--border);
+}
+
+.nav-icon { font-size: 17px; width: 22px; text-align: center; flex-shrink: 0; }
+
+.nav-badge {
+  margin-left: auto;
+  background: var(--red);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 20px;
+  min-width: 20px;
+  text-align: center;
+}
+
+.sidebar-footer {
+  padding: 14px 12px;
+  border-top: 1px solid var(--border);
+}
+
+.logout-btn {
+  width: 100%;
+  padding: 10px;
+  background: transparent;
+  border: 1.5px solid var(--border);
+  border-radius: 9px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.logout-btn:hover { border-color: var(--red); color: var(--red); background: #fdecea; }
+
+/* ── MAIN ──────────────────────────────────────────────────────────────────── */
+.main {
+  margin-left: var(--sidebar);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  height: 60px;
+  padding: 0 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.topbar-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 9px;
+  padding: 7px 12px;
+  font-size: 13px;
+}
+
+.search-box input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: var(--text);
+  width: 180px;
+}
+
+.search-box input::placeholder { color: var(--muted); }
+
+/* ── PAGES ─────────────────────────────────────────────────────────────────── */
+.page { display: none; padding: 30px; animation: fadeIn 0.2s ease; }
+.page.active { display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.page-headline {
+  font-family: 'Syne', sans-serif;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  margin-bottom: 6px;
+}
+
+.page-desc { font-size: 13.5px; color: var(--muted); margin-bottom: 26px; }
+
+/* ── STATS ROW ──────────────────────────────────────────────────────────────── */
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 14px;
+  margin-bottom: 26px;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  transition: border-color 0.2s;
+}
+
+.stat-card:hover { border-color: var(--green); }
+.stat-icon  { font-size: 22px; margin-bottom: 10px; }
+.stat-val   { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; margin-bottom: 3px; }
+.stat-label { font-size: 11.5px; color: var(--muted); }
+
+/* ── COMPLAINT TABLE ────────────────────────────────────────────────────────── */
+.table-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.table-toolbar {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filter-select {
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12.5px;
+  color: var(--text);
+  outline: none;
+  cursor: pointer;
+}
+
+.filter-select:focus { border-color: var(--green); }
+
+.table-head {
+  display: grid;
+  grid-template-columns: 2.2fr 1fr 0.9fr 1fr 1.3fr;
+  padding: 12px 20px;
+  background: var(--surface2);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns: 2.2fr 1fr 0.9fr 1fr 1.3fr;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  align-items: center;
+  transition: background 0.12s;
+  font-size: 13px;
+}
+
+.table-row:last-child { border-bottom: none; }
+.table-row:hover { background: var(--surface2); }
+
+.issue-title { font-weight: 600; color: var(--text); font-size: 13.5px; }
+.issue-sub   { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; }
+
+.badge.submitted  { background: #f3f3f3;  color: #555; }
+.badge.submitted::before { background: #999; }
+.badge.pending    { background: #fff8e1;  color: #e65100; }
+.badge.pending::before   { background: #e65100; }
+.badge.in_review  { background: #e3f2fd;  color: #1565c0; }
+.badge.in_review::before { background: #1565c0; }
+.badge.escalated  { background: #fdecea;  color: #c62828; }
+.badge.escalated::before { background: #c62828; }
+.badge.resolved   { background: #e8f5e8;  color: #1b5e20; }
+.badge.resolved::before  { background: #1b5e20; }
+
+.priority-tag { font-size: 12px; font-weight: 600; }
+.priority-tag.high, .priority-tag.urgent { color: var(--red); }
+.priority-tag.medium { color: var(--amber); }
+.priority-tag.low    { color: var(--green); }
+
+.action-btn {
+  padding: 6px 14px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s;
+}
+
+.action-btn:hover { background: var(--green); color: #fff; border-color: var(--green); }
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--muted);
+}
+
+.empty-state .empty-icon { font-size: 40px; margin-bottom: 12px; }
+.empty-state p { font-size: 14px; }
+
+/* ── UPDATE MODAL ───────────────────────────────────────────────────────────── */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.3);
+  backdrop-filter: blur(4px);
+  z-index: 500;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  width: 540px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 30px;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.15);
+  animation: modalIn 0.2s ease;
+}
+
+@keyframes modalIn {
+  from { opacity: 0; transform: scale(0.96) translateY(10px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.modal-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  flex: 1;
+  padding-right: 16px;
+}
+
+.modal-close {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+  color: var(--muted);
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+
+.modal-close:hover { background: #fdecea; color: var(--red); border-color: #ef9a9a; }
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.info-item { background: var(--surface2); border: 1px solid var(--border); border-radius: 9px; padding: 10px 12px; }
+.info-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 3px; }
+.info-val   { font-size: 13px; font-weight: 500; color: var(--text); }
+
+.modal-section { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 12px; margin-top: 20px; }
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tl-item { display: flex; gap: 10px; font-size: 12.5px; }
+.tl-dot  { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+.tl-dot.done   { background: var(--green); }
+.tl-dot.active { background: var(--amber); }
+.tl-dot.idle   { background: var(--border); }
+
+.tl-text  { color: var(--muted); line-height: 1.5; }
+.tl-text strong { color: var(--text); }
+.tl-by    { font-size: 10px; color: var(--border); }
+
+/* Update form inside modal */
+.update-form {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+}
+
+.update-form h4 {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 14px;
+  color: var(--text);
+}
+
+.form-row { margin-bottom: 14px; }
+
+.form-row label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.form-row select,
+.form-row textarea,
+.form-row input {
+  width: 100%;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.form-row select:focus,
+.form-row textarea:focus,
+.form-row input:focus { border-color: var(--green); }
+
+.form-row textarea { resize: vertical; min-height: 80px; }
+
+.update-actions { display: flex; gap: 10px; margin-top: 14px; }
+
+.btn-primary {
+  padding: 10px 22px;
+  background: var(--green);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-primary:hover { background: var(--green3); }
+
+.btn-secondary {
+  padding: 10px 18px;
+  background: var(--surface);
+  color: var(--muted);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-secondary:hover { background: var(--surface2); color: var(--text); }
+
+.success-toast {
+  display: none;
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  background: var(--green);
+  color: #fff;
+  padding: 14px 22px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 14px;
+  box-shadow: 0 8px 24px rgba(46,125,50,0.3);
+  z-index: 9999;
+  animation: toastIn 0.3s ease;
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Loading spinner */
+.spinner {
+  display: inline-block;
+  width: 18px; height: 18px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     LOGIN SCREEN
+═══════════════════════════════════════════════════════════════════════════════ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-badge">🏛 Authority Portal</div>
+    <div class="login-title">Sign in to<br>CivicPulse</div>
+    <div class="login-sub">Manage and update complaints assigned to your department.</div>
+
+    <div id="login-error" class="login-error"></div>
+
+    <div class="field-group">
+      <label>Username</label>
+      <input type="text" id="login-username" placeholder="e.g. publicworks" autocomplete="username">
+    </div>
+
+    <div class="field-group">
+      <label>Password</label>
+      <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
+    </div>
+
+    <button class="login-btn" id="login-btn" onclick="doLogin()">Sign In →</button>
+
+    <div class="login-hint">
+      <strong>Demo accounts:</strong>
+      <div class="hint-grid">
+        <div class="hint-row"><strong>admin</strong> / admin123</div>
+        <div class="hint-row"><strong>publicworks</strong> / pw123</div>
+        <div class="hint-row"><strong>utilities</strong> / ut123</div>
+        <div class="hint-row"><strong>parks</strong> / pk123</div>
+        <div class="hint-row"><strong>sanitation</strong> / sn123</div>
+        <div class="hint-row"><strong>water</strong> / wa123</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     AUTHORITY PORTAL
+═══════════════════════════════════════════════════════════════════════════════ -->
+<div id="portal">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="logo-wrap">
+      <div class="logo-mark">Civic<span>Pulse</span></div>
+      <div class="logo-tag">Authority Portal</div>
+    </div>
+
+    <div class="auth-info">
+      <div class="auth-name" id="sidebar-name">—</div>
+      <div class="auth-dept" id="sidebar-dept">—</div>
+    </div>
+
+    <nav class="portal-nav">
+      <div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:6px 12px 4px">Menu</div>
+      <div class="nav-item active" onclick="showPage('overview', this)">
+        <span class="nav-icon">🏠</span> Overview
+      </div>
+      <div class="nav-item" onclick="showPage('complaints', this)">
+        <span class="nav-icon">📋</span> All Complaints
+        <span class="nav-badge" id="nav-open-count">0</span>
+      </div>
+      <div class="nav-item" onclick="showPage('urgent', this)">
+        <span class="nav-icon">⚡</span> Urgent / Escalated
+        <span class="nav-badge" id="nav-urgent-count" style="background:var(--red)">0</span>
+      </div>
+      <div class="nav-item" onclick="showPage('resolved', this)">
+        <span class="nav-icon">✅</span> Resolved
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="logout-btn" onclick="doLogout()">⬤ Sign Out</button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbar-title">Overview</div>
+      <div class="search-box">
+        🔍 <input type="text" id="search-input" placeholder="Search complaints…" oninput="filterTable()">
+      </div>
+    </div>
+
+    <!-- ── OVERVIEW PAGE ─────────────────────────────────────────────────── -->
+    <div class="page active" id="page-overview">
+      <div class="page-headline">Good day 👋</div>
+      <div class="page-desc" id="overview-desc">Here's a summary of your department's complaints.</div>
+
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="stat-icon">📋</div>
+          <div class="stat-val" id="stat-total">—</div>
+          <div class="stat-label">Total Assigned</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🔓</div>
+          <div class="stat-val" id="stat-open">—</div>
+          <div class="stat-label">Open / Active</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">✅</div>
+          <div class="stat-val" id="stat-resolved">—</div>
+          <div class="stat-label">Resolved</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">⚡</div>
+          <div class="stat-val" id="stat-urgent">—</div>
+          <div class="stat-label">Urgent</div>
+        </div>
+      </div>
+
+      <!-- Recent complaints table -->
+      <div class="table-card">
+        <div class="table-head">
+          <div>Issue</div><div>Status</div><div>Priority</div><div>Submitted</div><div>Action</div>
+        </div>
+        <div id="overview-rows">
+          <div class="empty-state"><div class="empty-icon">📭</div><p>Loading…</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ALL COMPLAINTS PAGE ────────────────────────────────────────────── -->
+    <div class="page" id="page-complaints">
+      <div class="page-headline">📋 All Complaints</div>
+      <div class="page-desc">All complaints assigned to your department.</div>
+
+      <div class="table-card">
+        <div class="table-toolbar">
+          <select class="filter-select" id="filter-status" onchange="filterTable()">
+            <option value="">All Statuses</option>
+            <option>Submitted</option>
+            <option>Pending</option>
+            <option>In Review</option>
+            <option>Escalated</option>
+            <option>Resolved</option>
+          </select>
+          <select class="filter-select" id="filter-priority" onchange="filterTable()">
+            <option value="">All Priorities</option>
+            <option>Low</option>
+            <option>Medium</option>
+            <option>High</option>
+            <option>Urgent</option>
+          </select>
+        </div>
+        <div class="table-head">
+          <div>Issue</div><div>Status</div><div>Priority</div><div>Submitted</div><div>Action</div>
+        </div>
+        <div id="all-rows">
+          <div class="empty-state"><div class="empty-icon">📭</div><p>Loading…</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── URGENT PAGE ────────────────────────────────────────────────────── -->
+    <div class="page" id="page-urgent">
+      <div class="page-headline">⚡ Urgent & Escalated</div>
+      <div class="page-desc">High-priority complaints that need immediate attention.</div>
+
+      <div class="table-card">
+        <div class="table-head">
+          <div>Issue</div><div>Status</div><div>Priority</div><div>Submitted</div><div>Action</div>
+        </div>
+        <div id="urgent-rows">
+          <div class="empty-state"><div class="empty-icon">✅</div><p>No urgent issues right now.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── RESOLVED PAGE ─────────────────────────────────────────────────── -->
+    <div class="page" id="page-resolved">
+      <div class="page-headline">✅ Resolved</div>
+      <div class="page-desc">Complaints successfully resolved by your department.</div>
+
+      <div class="table-card">
+        <div class="table-head">
+          <div>Issue</div><div>Status</div><div>Priority</div><div>Submitted</div><div>Action</div>
+        </div>
+        <div id="resolved-rows">
+          <div class="empty-state"><div class="empty-icon">📭</div><p>No resolved complaints yet.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     UPDATE MODAL
+═══════════════════════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Update Complaint</div>
+      <div class="modal-close" onclick="closeModal()">✕</div>
+    </div>
+
+    <!-- Complaint info -->
+    <div class="info-grid">
+      <div class="info-item"><div class="info-label">Ref</div><div class="info-val" id="m-ref">—</div></div>
+      <div class="info-item"><div class="info-label">Category</div><div class="info-val" id="m-cat">—</div></div>
+      <div class="info-item"><div class="info-label">Reporter</div><div class="info-val" id="m-name">—</div></div>
+      <div class="info-item"><div class="info-label">Contact</div><div class="info-val" id="m-contact">—</div></div>
+      <div class="info-item" style="grid-column:span 2"><div class="info-label">Location</div><div class="info-val" id="m-location">—</div></div>
+    </div>
+
+    <div id="m-desc-wrap" style="margin-bottom:16px">
+      <div class="info-label">Description</div>
+      <div id="m-desc" style="font-size:13px;color:var(--muted);line-height:1.6;margin-top:4px">—</div>
+    </div>
+
+    <!-- Timeline -->
+    <div class="modal-section">📅 Timeline</div>
+    <div class="timeline" id="modal-timeline"></div>
+
+    <!-- Update form -->
+    <div class="update-form">
+      <h4>✏️ Post an Update</h4>
+
+      <div class="form-row">
+        <label>New Status</label>
+        <select id="update-status">
+          <option value="">— keep current —</option>
+          <option value="Submitted">Submitted</option>
+          <option value="Pending">Pending</option>
+          <option value="In Review">In Review</option>
+          <option value="Escalated">Escalated</option>
+          <option value="Resolved">Resolved</option>
+        </select>
+      </div>
+
+      <div class="form-row">
+        <label>Progress Note <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+        <input type="text" id="update-note-label" placeholder="Short label e.g. 'Crew Dispatched'">
+      </div>
+
+      <div class="form-row">
+        <label>Details</label>
+        <textarea id="update-note-desc" placeholder="Any additional information for the citizen…"></textarea>
+      </div>
+
+      <div class="update-actions">
+        <button class="btn-primary" id="save-update-btn" onclick="saveUpdate()">Save Update</button>
+        <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="success-toast" id="toast"></div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════════════════════════════════════════ -->
+<script>
+// ── State ─────────────────────────────────────────────────────────────────────
+let currentAuthority = null;
+let allComplaints    = [];
+let activeComplaint  = null;
+
+const PAGE_TITLES = {
+  overview:   'Overview',
+  complaints: 'All Complaints',
+  urgent:     'Urgent & Escalated',
+  resolved:   'Resolved',
+};
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', async () => {
+  // Check if already logged in (session cookie)
+  try {
+    const res  = await fetch('/api/auth/me', { credentials: 'include' });
+    const data = await res.json();
+    if (data.success) {
+      currentAuthority = data.authority;
+      showPortal();
+    }
+  } catch (e) { /* not logged in */ }
+
+  // Allow Enter key on login form
+  document.getElementById('login-password').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+});
+
+// ── Login / Logout ────────────────────────────────────────────────────────────
+async function doLogin() {
+  const username = document.getElementById('login-username').value.trim();
+  const password = document.getElementById('login-password').value;
+  const errBox   = document.getElementById('login-error');
+  const btn      = document.getElementById('login-btn');
+
+  if (!username || !password) {
+    errBox.textContent = '⚠️ Please enter your username and password.';
+    errBox.style.display = 'block';
+    return;
+  }
+
+  btn.innerHTML = '<span class="spinner"></span>Signing in…';
+  btn.disabled  = true;
+  errBox.style.display = 'none';
+
+  try {
+    const res  = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ username, password }),
+    });
+    const data = await res.json();
+
+    if (!data.success) {
+      errBox.textContent  = '⚠️ ' + data.error;
+      errBox.style.display = 'block';
+      btn.innerHTML = 'Sign In →';
+      btn.disabled  = false;
+      return;
+    }
+
+    currentAuthority = data.authority;
+    showPortal();
+
+  } catch (e) {
+    errBox.textContent  = '⚠️ Cannot reach server. Is Flask running on port 8080?';
+    errBox.style.display = 'block';
+    btn.innerHTML = 'Sign In →';
+    btn.disabled  = false;
+  }
+}
+
+async function doLogout() {
+  await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+  currentAuthority = null;
+  allComplaints    = [];
+  document.getElementById('portal').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('login-username').value = '';
+  document.getElementById('login-password').value = '';
+}
+
+// ── Portal ────────────────────────────────────────────────────────────────────
+function showPortal() {
+  document.getElementById('login-screen').style.display  = 'none';
+  document.getElementById('portal').style.display = 'flex';
+
+  document.getElementById('sidebar-name').textContent = currentAuthority.name;
+  document.getElementById('sidebar-dept').textContent =
+    currentAuthority.department === 'ALL' ? 'All Departments' : currentAuthority.department;
+
+  loadComplaints();
+}
+
+async function loadComplaints() {
+  try {
+    const res  = await fetch('/api/authority/complaints', { credentials: 'include' });
+    const data = await res.json();
+    if (data.success) {
+      allComplaints = data.data;
+      renderAll();
+      loadStats();
+    }
+  } catch (e) {
+    console.error('Failed to load complaints:', e);
+  }
+}
+
+async function loadStats() {
+  try {
+    const res  = await fetch('/api/authority/stats', { credentials: 'include' });
+    const data = await res.json();
+    if (data.success) {
+      const s = data.data;
+      document.getElementById('stat-total').textContent    = s.total;
+      document.getElementById('stat-open').textContent     = s.open;
+      document.getElementById('stat-resolved').textContent = s.resolved;
+      document.getElementById('stat-urgent').textContent   = s.urgent;
+      document.getElementById('nav-open-count').textContent   = s.open;
+      document.getElementById('nav-urgent-count').textContent = s.urgent;
+      document.getElementById('overview-desc').textContent =
+        `Summary for ${currentAuthority.department === 'ALL' ? 'all departments' : currentAuthority.department}.`;
+    }
+  } catch (e) {}
+}
+
+// ── Render helpers ────────────────────────────────────────────────────────────
+function statusBadgeClass(status) {
+  return status.toLowerCase().replace(/ /g, '_');
+}
+
+function priorityClass(p) {
+  return p.toLowerCase();
+}
+
+function formatDate(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function buildRows(complaints) {
+  if (!complaints.length) {
+    return `<div class="empty-state"><div class="empty-icon">📭</div><p>No complaints found.</p></div>`;
+  }
+  return complaints.map(c => `
+    <div class="table-row">
+      <div>
+        <div class="issue-title">${c.category_emoji || ''} ${c.title}</div>
+        <div class="issue-sub">${c.ref_number} · ${c.location} · by ${c.full_name}</div>
+      </div>
+      <div><span class="badge ${statusBadgeClass(c.status)}">${c.status}</span></div>
+      <div><span class="priority-tag ${priorityClass(c.priority)}">● ${c.priority}</span></div>
+      <div style="font-size:12px;color:var(--muted)">${formatDate(c.submitted_at)}</div>
+      <div><button class="action-btn" onclick="openModal('${c.id}')">Update</button></div>
+    </div>
+  `).join('');
+}
+
+function renderAll() {
+  // Overview — latest 5
+  document.getElementById('overview-rows').innerHTML = buildRows(allComplaints.slice(0, 5));
+
+  // All
+  applyFilters();
+
+  // Urgent
+  const urgent = allComplaints.filter(c => ['High','Urgent'].includes(c.priority) || c.status === 'Escalated');
+  document.getElementById('urgent-rows').innerHTML = buildRows(urgent);
+
+  // Resolved
+  const resolved = allComplaints.filter(c => c.status === 'Resolved');
+  document.getElementById('resolved-rows').innerHTML = buildRows(resolved);
+}
+
+function applyFilters() {
+  const statusF   = document.getElementById('filter-status')?.value   || '';
+  const priorityF = document.getElementById('filter-priority')?.value || '';
+  const search    = document.getElementById('search-input')?.value.toLowerCase() || '';
+
+  let filtered = allComplaints;
+  if (statusF)   filtered = filtered.filter(c => c.status   === statusF);
+  if (priorityF) filtered = filtered.filter(c => c.priority === priorityF);
+  if (search)    filtered = filtered.filter(c =>
+    (c.title || '').toLowerCase().includes(search) ||
+    (c.location || '').toLowerCase().includes(search) ||
+    (c.full_name || '').toLowerCase().includes(search)
+  );
+
+  document.getElementById('all-rows').innerHTML = buildRows(filtered);
+}
+
+function filterTable() { applyFilters(); }
+
+// ── Navigation ────────────────────────────────────────────────────────────────
+function showPage(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  if (el) el.classList.add('active');
+  document.getElementById('topbar-title').textContent = PAGE_TITLES[id] || id;
+}
+
+// ── Modal ─────────────────────────────────────────────────────────────────────
+function openModal(complaintId) {
+  activeComplaint = allComplaints.find(c => c.id === complaintId);
+  if (!activeComplaint) return;
+
+  const c = activeComplaint;
+
+  document.getElementById('modal-title').textContent    = `${c.category_emoji || ''} ${c.title}`;
+  document.getElementById('m-ref').textContent          = c.ref_number;
+  document.getElementById('m-cat').textContent          = c.category;
+  document.getElementById('m-name').textContent         = c.full_name;
+  document.getElementById('m-contact').textContent      = c.contact;
+  document.getElementById('m-location').textContent     = c.location;
+  document.getElementById('m-desc').textContent         = c.description || 'No description provided.';
+
+  // Pre-select current status
+  document.getElementById('update-status').value        = '';
+  document.getElementById('update-note-label').value    = '';
+  document.getElementById('update-note-desc').value     = '';
+
+  // Render timeline
+  renderTimeline(c.timeline || []);
+
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function renderTimeline(events) {
+  if (!events.length) {
+    document.getElementById('modal-timeline').innerHTML =
+      '<div style="font-size:13px;color:var(--muted)">No timeline events yet.</div>';
+    return;
+  }
+
+  document.getElementById('modal-timeline').innerHTML = events.map((e, i) => {
+    const dotClass = i === events.length - 1 ? 'active' : 'done';
+    const by = e.updated_by ? `<div class="tl-by">— ${e.updated_by}</div>` : '';
+    return `
+      <div class="tl-item">
+        <div class="tl-dot ${dotClass}"></div>
+        <div class="tl-text">
+          <strong>${e.label}</strong>
+          ${e.description ? ' — ' + e.description : ''}
+          ${by}
+          <div style="font-size:10.5px;color:var(--muted);margin-top:1px">${formatDate(e.timestamp)}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  activeComplaint = null;
+}
+
+function closeModalOutside(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+}
+
+// ── Save update ───────────────────────────────────────────────────────────────
+async function saveUpdate() {
+  if (!activeComplaint) return;
+
+  const status    = document.getElementById('update-status').value;
+  const noteLabel = document.getElementById('update-note-label').value.trim();
+  const noteDesc  = document.getElementById('update-note-desc').value.trim();
+  const btn       = document.getElementById('save-update-btn');
+
+  if (!status && !noteLabel) {
+    showToast('⚠️ Choose a new status or add a note label.', '#c62828');
+    return;
+  }
+
+  btn.innerHTML = '<span class="spinner"></span>Saving…';
+  btn.disabled  = true;
+
+  try {
+    // 1. Update status if selected
+    if (status) {
+      const res  = await fetch(`/api/authority/complaints/${activeComplaint.id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ status, note: noteDesc || null }),
+      });
+      const data = await res.json();
+      if (!data.success) {
+        showToast('⚠️ ' + (data.error || data.errors?.join(' ')), '#c62828');
+        btn.innerHTML = 'Save Update';
+        btn.disabled  = false;
+        return;
+      }
+      // Update local record
+      Object.assign(activeComplaint, data.data);
+    }
+
+    // 2. Add note if label provided (and status wasn't already the note)
+    if (noteLabel && !status) {
+      const res  = await fetch(`/api/authority/complaints/${activeComplaint.id}/note`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ label: noteLabel, description: noteDesc || null }),
+      });
+      const data = await res.json();
+      if (!data.success) {
+        showToast('⚠️ ' + (data.error || data.errors?.join(' ')), '#c62828');
+        btn.innerHTML = 'Save Update';
+        btn.disabled  = false;
+        return;
+      }
+      activeComplaint.timeline.push(data.data);
+    }
+
+    // Refresh timeline in modal
+    renderTimeline(activeComplaint.timeline || []);
+
+    // Refresh tables
+    const idx = allComplaints.findIndex(c => c.id === activeComplaint.id);
+    if (idx !== -1) allComplaints[idx] = activeComplaint;
+    renderAll();
+    loadStats();
+
+    btn.innerHTML = 'Save Update';
+    btn.disabled  = false;
+
+    showToast('✅ Complaint updated successfully!');
+
+    setTimeout(closeModal, 1200);
+
+  } catch (e) {
+    showToast('⚠️ Network error. Check Flask is running.', '#c62828');
+    btn.innerHTML = 'Save Update';
+    btn.disabled  = false;
+  }
+}
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
+function showToast(msg, color = 'var(--green)') {
+  const t = document.getElementById('toast');
+  t.textContent        = msg;
+  t.style.background   = color;
+  t.style.display      = 'block';
+  setTimeout(() => { t.style.display = 'none'; }, 3000);
+}
+</script>
+</body>
+</html>

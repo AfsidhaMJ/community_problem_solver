@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CivicPulse Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f0f7f0;
+    --surface: #ffffff;
+    --surface2: #e8f5e8;
+    --border: #c8e6c8;
+    --accent: #2e7d32;
+    --accent2: #388e3c;
+    --accent3: #1b5e20;
+    --text: #0a0a0a;
+    --muted: #4a6b4a;
+    --sidebar-w: 260px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: var(--sidebar-w);
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    padding: 28px 24px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo-mark {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+    letter-spacing: -0.5px;
+    color: var(--text);
+  }
+
+  .logo-mark span {
+    color: var(--accent);
+  }
+
+  .logo-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 3px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  nav {
+    flex: 1;
+    padding: 20px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .nav-label {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 8px 12px 4px;
+    font-weight: 500;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 400;
+    transition: all 0.18s ease;
+    border: 1px solid transparent;
+    text-decoration: none;
+  }
+
+  .nav-item:hover {
+    background: var(--surface2);
+    color: var(--text);
+  }
+
+  .nav-item.active {
+    background: var(--surface2);
+    color: var(--text);
+    border-color: var(--border);
+    font-weight: 500;
+  }
+
+  .nav-item.active .nav-icon {
+    filter: brightness(1.4);
+  }
+
+  .nav-icon {
+    font-size: 18px;
+    width: 22px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .nav-badge {
+    margin-left: auto;
+    background: var(--accent);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 20px;
+  }
+
+  .sidebar-footer {
+    padding: 16px 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  .user-pill {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .user-pill:hover { background: var(--surface2); }
+
+  .avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2e7d32, #388e3c);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; color: #fff;
+    flex-shrink: 0;
+  }
+
+  .user-info { flex: 1; min-width: 0; }
+  .user-name { font-size: 13px; font-weight: 500; color: var(--text); }
+  .user-role { font-size: 11px; color: var(--muted); }
+
+  /* ── MAIN ── */
+  .main {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .page-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 17px;
+  }
+
+  .topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .btn {
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .btn-primary:hover { background: #1b5e20; }
+
+  .btn-ghost {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+
+  .btn-ghost:hover { background: #d0e8d0; }
+
+  /* ── PAGES ── */
+  .page { display: none; padding: 36px 32px; animation: fadeIn 0.22s ease; }
+  .page.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .page-header {
+    margin-bottom: 32px;
+  }
+
+  .page-headline {
+    font-family: 'Syne', sans-serif;
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .page-desc {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* ── CARDS / GRID ── */
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .stat-card:hover { border-color: #353848; }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: -30px; right: -30px;
+    width: 90px; height: 90px;
+    border-radius: 50%;
+    opacity: 0.08;
+  }
+
+  .stat-card.yellow::before { background: var(--accent); }
+  .stat-card.blue::before   { background: var(--accent2); }
+  .stat-card.green::before  { background: var(--accent3); }
+  .stat-card.red::before    { background: #f06060; }
+
+  .stat-icon { font-size: 22px; margin-bottom: 12px; }
+  .stat-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px; font-weight: 800;
+    margin-bottom: 4px;
+  }
+
+  .stat-label { font-size: 12px; color: var(--muted); }
+
+  /* ── REPORT FORM ── */
+  .form-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 30px;
+    max-width: 640px;
+  }
+
+  .form-group { margin-bottom: 20px; }
+
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    margin-bottom: 7px;
+    letter-spacing: 0.03em;
+  }
+
+  input, textarea, select {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 11px 14px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  input:focus, textarea:focus, select:focus {
+    border-color: var(--accent);
+  }
+
+  select option { background: var(--surface); }
+  textarea { resize: vertical; min-height: 100px; }
+
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .cat-btn {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 12px 8px;
+    text-align: center;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 13px;
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .cat-btn:hover, .cat-btn.selected {
+    border-color: var(--accent);
+    color: var(--text);
+    background: #e8f5e8;
+  }
+
+  .cat-emoji { font-size: 20px; display: block; margin-bottom: 4px; }
+
+  /* ── TRACKER TABLE ── */
+  .table-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .table-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    padding: 14px 22px;
+    background: var(--surface2);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .table-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    padding: 16px 22px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13.5px;
+    align-items: center;
+    transition: background 0.12s;
+    cursor: pointer;
+  }
+
+  .table-row:last-child { border-bottom: none; }
+  .table-row:hover { background: var(--surface2); }
+
+  .issue-title { font-weight: 500; color: var(--text); }
+  .issue-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+  }
+
+  .badge.pending    { background: #f1f8e9; color: #2e7d32; }
+  .badge.pending::before   { background: #2e7d32; }
+  .badge.review     { background: #e3f2fd; color: #1976d2; }
+  .badge.review::before    { background: #1976d2; }
+  .badge.resolved   { background: #e8f5e8; color: #388e3c; }
+  .badge.resolved::before  { background: #388e3c; }
+  .badge.escalated  { background: #fdecea; color: #c62828; }
+  .badge.escalated::before { background: #c62828; }
+
+  .priority { font-size: 12px; }
+  .priority.high   { color: #c62828; }
+  .priority.medium { color: #2e7d32; }
+  .priority.low    { color: #388e3c; }
+
+  /* ── PROGRESS / UPDATES PAGE ── */
+  .updates-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .update-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px;
+    transition: border-color 0.2s;
+  }
+
+  .update-card:hover { border-color: #353848; }
+
+  .update-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .update-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .icon-yellow { background: #f1f8e9; }
+  .icon-blue   { background: #e3f2fd; }
+  .icon-green  { background: #e8f5e8; }
+
+  .update-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text);
+  }
+
+  .update-date { font-size: 11px; color: var(--muted); }
+
+  .progress-bar {
+    background: var(--border);
+    border-radius: 4px;
+    height: 6px;
+    overflow: hidden;
+    margin: 12px 0 6px;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+  }
+
+  .fill-yellow { background: var(--accent); }
+  .fill-blue   { background: var(--accent2); }
+  .fill-green  { background: var(--accent3); }
+
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .timeline {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .tl-item {
+    display: flex;
+    gap: 10px;
+    font-size: 12.5px;
+  }
+
+  .tl-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+
+  .tl-dot.done   { background: var(--accent3); }
+  .tl-dot.active { background: var(--accent); }
+  .tl-dot.idle   { background: var(--border); }
+
+  .tl-text { color: var(--muted); line-height: 1.4; }
+  .tl-text strong { color: var(--text); }
+
+  /* responsive */
+  @media (max-width: 768px) {
+    .sidebar { transform: translateX(-100%); }
+    .main { margin-left: 0; }
+    .updates-grid { grid-template-columns: 1fr; }
+    .category-grid { grid-template-columns: repeat(2, 1fr); }
+    .table-header, .table-row { grid-template-columns: 2fr 1fr; }
+    .table-header > *:nth-child(n+3),
+    .table-row > *:nth-child(n+3) { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-mark">Civic<span>Pulse</span></div>
+    <div class="logo-sub">Community Dashboard</div>
+  </div>
+
+  <nav>
+    <div class="nav-label">Main</div>
+    <a class="nav-item active" onclick="showPage('overview', this)">
+      <span class="nav-icon">🏠</span> Overview
+    </a>
+
+    <div class="nav-label">Actions</div>
+    <a class="nav-item" onclick="showPage('report', this)">
+      <span class="nav-icon">📢</span> Report a Problem
+      <span class="nav-badge">New</span>
+    </a>
+    <a class="nav-item" onclick="showPage('authorities', this)">
+      <span class="nav-icon">🏛</span> Sent to Authorities
+    </a>
+    <a class="nav-item" onclick="showPage('updates', this)">
+      <span class="nav-icon">🔔</span> Track Updates
+    </a>
+
+  </nav>
+
+</aside>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+  <div class="topbar">
+    <div class="page-title" id="topbar-title">Overview</div>
+    <div class="topbar-actions">
+      <button class="btn btn-ghost" onclick="showPage('updates', document.querySelector('[onclick*=updates]'))">🔔 3 Updates</button>
+      <button class="btn btn-primary" onclick="showPage('report', document.querySelector('[onclick*=report]'))">+ Report Issue</button>
+    </div>
+  </div>
+
+  <!-- PAGE: OVERVIEW -->
+  <div class="page active" id="page-overview">
+    <div class="page-header">
+      <div class="page-headline">Good morning 👋</div>
+      <div class="page-desc">Here's what's happening in your community today.</div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-card yellow">
+        <div class="stat-icon">📋</div>
+        <div class="stat-val" id="open-count">24</div>
+        <div class="stat-label">Open Reports</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-icon">🏛</div>
+        <div class="stat-val">18</div>
+        <div class="stat-label">Sent to Authorities</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-icon">✅</div>
+        <div class="stat-val">9</div>
+        <div class="stat-label">Resolved This Month</div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-icon">⚡</div>
+        <div class="stat-val">3</div>
+        <div class="stat-label">Urgent Issues</div>
+      </div>
+    </div>
+
+    <div class="table-card" id="overview-table">
+      <div class="table-header">
+        <div>Issue</div>
+        <div>Status</div>
+        <div>Priority</div>
+        <div>Date</div>
+      </div>
+      <div class="table-row">
+        <div>
+          <div class="issue-title">🕳 Pothole on Elm Street</div>
+          <div class="issue-sub">Public Works · #1042</div>
+        </div>
+        <div><span class="badge review">In Review</span></div>
+        <div><span class="priority high">● High</span></div>
+        <div style="font-size:12px;color:var(--muted)">Feb 24</div>
+      </div>
+      <div class="table-row">
+        <div>
+          <div class="issue-title">💡 Street light out — Park Ave</div>
+          <div class="issue-sub">Utilities · #1039</div>
+        </div>
+        <div><span class="badge pending">Pending</span></div>
+        <div><span class="priority medium">● Medium</span></div>
+        <div style="font-size:12px;color:var(--muted)">Feb 21</div>
+      </div>
+      <div class="table-row">
+        <div>
+          <div class="issue-title">🗑 Overflowing bin — River Walk</div>
+          <div class="issue-sub">Sanitation · #1035</div>
+        </div>
+        <div><span class="badge resolved">Resolved</span></div>
+        <div><span class="priority low">● Low</span></div>
+        <div style="font-size:12px;color:var(--muted)">Feb 19</div>
+      </div>
+      <div class="table-row">
+        <div>
+          <div class="issue-title">🚧 Broken guardrail — Highway 9</div>
+          <div class="issue-sub">Transport · #1030</div>
+        </div>
+        <div><span class="badge escalated">Escalated</span></div>
+        <div><span class="priority high">● High</span></div>
+        <div style="font-size:12px;color:var(--muted)">Feb 15</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: REPORT A PROBLEM -->
+  <div class="page" id="page-report">
+    <div class="page-header">
+      <div class="page-headline">📢 Report a Problem</div>
+      <div class="page-desc">Submit a local issue and it will be automatically routed to the right authority.</div>
+    </div>
+
+    <div class="form-card">
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+        <div class="form-group" style="margin-bottom:0">
+          <label>Your Name <span style="color:#c62828">*</span></label>
+          <input type="text" id="reporter-name" placeholder="Full name…">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label>Email / Phone <span style="color:#c62828">*</span></label>
+          <input type="text" id="reporter-contact" placeholder="For status updates…">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Category</label>
+        <div class="category-grid">
+          <button class="cat-btn selected" onclick="selectCat(this)" data-cat="🕳" data-label="Roads">
+            <span class="cat-emoji">🕳</span>Roads
+          </button>
+          <button class="cat-btn" onclick="selectCat(this)" data-cat="💡" data-label="Lighting">
+            <span class="cat-emoji">💡</span>Lighting
+          </button>
+          <button class="cat-btn" onclick="selectCat(this)" data-cat="🌳" data-label="Parks">
+            <span class="cat-emoji">🌳</span>Parks
+          </button>
+          <button class="cat-btn" onclick="selectCat(this)" data-cat="🗑" data-label="Sanitation">
+            <span class="cat-emoji">🗑</span>Sanitation
+          </button>
+          <button class="cat-btn" onclick="selectCat(this)" data-cat="🚰" data-label="Water">
+            <span class="cat-emoji">🚰</span>Water
+          </button>
+          <button class="cat-btn" onclick="selectCat(this)" data-cat="⚠️" data-label="Safety">
+            <span class="cat-emoji">⚠️</span>Safety
+          </button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Title <span style="color:#c62828">*</span></label>
+        <input type="text" id="report-title" placeholder="Brief description of the problem…">
+      </div>
+
+      <div class="form-group">
+        <label>Location <span style="color:#c62828">*</span></label>
+        <input type="text" id="report-location" placeholder="Street address or landmark…">
+      </div>
+
+      <div class="form-group">
+        <label>Details</label>
+        <textarea id="report-details" placeholder="Describe the issue in more detail. When did it start? Any safety risks?"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Priority</label>
+        <select id="report-priority">
+          <option value="Low">Low — General maintenance</option>
+          <option value="Medium" selected>Medium — Needs attention soon</option>
+          <option value="High">High — Safety risk</option>
+          <option value="Urgent">Urgent — Immediate danger</option>
+        </select>
+      </div>
+
+      <div id="report-error" style="display:none;background:#fdecea;border:1px solid #c62828;color:#c62828;padding:10px 14px;border-radius:9px;font-size:13px;margin-bottom:14px;">
+        ⚠️ Please fill in all required fields (Name, Contact, Title, Location).
+      </div>
+
+      <button class="btn btn-primary" id="submit-btn" style="width:100%;padding:13px;font-size:14px;" onclick="submitReport()">
+        Submit Report →
+      </button>
+    </div>
+  </div>
+
+  <!-- PAGE: SENT TO AUTHORITIES -->
+  <div class="page" id="page-authorities">
+    <div class="page-header">
+      <div class="page-headline">🏛 Sent to Authorities</div>
+      <div class="page-desc">Reports have been automatically dispatched to the relevant government departments.</div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-card blue">
+        <div class="stat-icon">🏛</div>
+        <div class="stat-val">18</div>
+        <div class="stat-label">Total Dispatched</div>
+      </div>
+      <div class="stat-card yellow">
+        <div class="stat-icon">⏱</div>
+        <div class="stat-val">2.4d</div>
+        <div class="stat-label">Avg. Response Time</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-icon">📬</div>
+        <div class="stat-val">12</div>
+        <div class="stat-label">Acknowledged</div>
+      </div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-header">
+        <div>Issue</div>
+        <div>Dept. Notified</div>
+        <div>Priority</div>
+        <div>Dispatched</div>
+      </div>
+      <div class="table-row">
+        <div>
+          <div class="issue-title">🕳 Pothole on Elm Street</div>
+          <div class="issue-sub">#1042 · Acknowledged</div>
+        </div>
+        <div style="font-size:13px;color:var(--text)">Public Works</div>
+        <div><span class="priority high">● High</span></div>
+        <div style="font-size:12px;color:var(--muted)">Feb 24</div>
+      </div>
+      <div class="table-row">
+        <div>
+          <div class="issue-title">🚧 Broken guardrail — Hwy 9</div>
+          <div class="issue-sub">#1030 · Escalated</div>
+        </div>
+        <div style="font-size:13px;color:var(--text)">Transport Dept.</div>
+        <div><span class="priority high">● High</span></div>
+        <div style="font-size:12px;color:var(--muted)">Feb 15</div>
+      </div>
+      <div class="table-row">
+        <div>
+          <div class="issue-title">💡 Street light — Park Ave</div>
+          <div class="issue-sub">#1039 · Pending Response</div>
+        </div>
+        <div style="font-size:13px;color:var(--text)">Utilities Board</div>
+        <div><span class="priority medium">● Medium</span></div>
+        <div style="font-size:12px;color:var(--muted)">Feb 21</div>
+      </div>
+      <div class="table-row">
+        <div>
+          <div class="issue-title">🌳 Fallen tree — Cedar Lane</div>
+          <div class="issue-sub">#1028 · Work Scheduled</div>
+        </div>
+        <div style="font-size:13px;color:var(--text)">Parks & Rec.</div>
+        <div><span class="priority medium">● Medium</span></div>
+        <div style="font-size:12px;color:var(--muted)">Feb 12</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE: TRACK UPDATES -->
+  <div class="page" id="page-updates">
+    <div class="page-header">
+      <div class="page-headline">🔔 Track Updates</div>
+      <div class="page-desc">Transparent, real-time progress on every issue you've reported.</div>
+    </div>
+
+    <div class="updates-grid" id="updates-grid">
+      <div class="update-card">
+        <div class="update-card-header">
+          <div class="update-icon icon-yellow">🕳</div>
+          <div>
+            <div class="update-name">Pothole on Elm Street</div>
+            <div class="update-date">Reported Feb 24 · #1042</div>
+          </div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill fill-yellow" style="width:55%"></div></div>
+        <div class="progress-label"><span>In Review</span><span>55%</span></div>
+        <div class="timeline">
+          <div class="tl-item"><div class="tl-dot done"></div><div class="tl-text"><strong>Submitted</strong> — Feb 24, 9:12 AM</div></div>
+          <div class="tl-item"><div class="tl-dot done"></div><div class="tl-text"><strong>Sent to Public Works</strong> — Feb 24, 9:13 AM</div></div>
+          <div class="tl-item"><div class="tl-dot active"></div><div class="tl-text"><strong>Under Review</strong> — Dept. acknowledged Feb 25</div></div>
+          <div class="tl-item"><div class="tl-dot idle"></div><div class="tl-text">Repair Scheduled</div></div>
+          <div class="tl-item"><div class="tl-dot idle"></div><div class="tl-text">Resolved</div></div>
+        </div>
+      </div>
+
+      <div class="update-card">
+        <div class="update-card-header">
+          <div class="update-icon icon-blue">💡</div>
+          <div>
+            <div class="update-name">Street Light — Park Ave</div>
+            <div class="update-date">Reported Feb 21 · #1039</div>
+          </div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill fill-blue" style="width:25%"></div></div>
+        <div class="progress-label"><span>Pending</span><span>25%</span></div>
+        <div class="timeline">
+          <div class="tl-item"><div class="tl-dot done"></div><div class="tl-text"><strong>Submitted</strong> — Feb 21, 3:48 PM</div></div>
+          <div class="tl-item"><div class="tl-dot active"></div><div class="tl-text"><strong>Sent to Utilities Board</strong> — Awaiting response</div></div>
+          <div class="tl-item"><div class="tl-dot idle"></div><div class="tl-text">Under Review</div></div>
+          <div class="tl-item"><div class="tl-dot idle"></div><div class="tl-text">Repair Scheduled</div></div>
+          <div class="tl-item"><div class="tl-dot idle"></div><div class="tl-text">Resolved</div></div>
+        </div>
+      </div>
+
+      <div class="update-card">
+        <div class="update-card-header">
+          <div class="update-icon icon-green">🗑</div>
+          <div>
+            <div class="update-name">Overflowing Bin — River Walk</div>
+            <div class="update-date">Reported Feb 19 · #1035</div>
+          </div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill fill-green" style="width:100%"></div></div>
+        <div class="progress-label"><span>Resolved ✓</span><span>100%</span></div>
+        <div class="timeline">
+          <div class="tl-item"><div class="tl-dot done"></div><div class="tl-text"><strong>Submitted</strong> — Feb 19</div></div>
+          <div class="tl-item"><div class="tl-dot done"></div><div class="tl-text"><strong>Sent to Sanitation</strong> — Feb 19</div></div>
+          <div class="tl-item"><div class="tl-dot done"></div><div class="tl-text"><strong>Crew Dispatched</strong> — Feb 20</div></div>
+          <div class="tl-item"><div class="tl-dot done"></div><div class="tl-text"><strong>Resolved</strong> — Feb 20, 11:30 AM</div></div>
+        </div>
+      </div>
+
+      <div class="update-card" style="border-color:#fdecea;">
+        <div class="update-card-header">
+          <div class="update-icon" style="background:#fdecea;">🚧</div>
+          <div>
+            <div class="update-name">Broken Guardrail — Hwy 9</div>
+            <div class="update-date">Reported Feb 15 · #1030</div>
+          </div>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:70%;background:#c62828;"></div></div>
+        <div class="progress-label"><span style="color:#c62828;">Escalated ⚡</span><span>70%</span></div>
+        <div class="timeline">
+          <div class="tl-item"><div class="tl-dot done"></div><div class="tl-text"><strong>Submitted</strong> — Feb 15</div></div>
+          <div class="tl-item"><div class="tl-dot done"></div><div class="tl-text"><strong>Escalated to Transport Dept.</strong></div></div>
+          <div class="tl-item"><div class="tl-dot done"></div><div class="tl-text"><strong>Emergency Assessment</strong> — Feb 16</div></div>
+          <div class="tl-item"><div class="tl-dot active"></div><div class="tl-text"><strong>Repair in Progress</strong> — Est. Feb 28</div></div>
+          <div class="tl-item"><div class="tl-dot idle"></div><div class="tl-text">Resolved</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+const titles = {
+  overview: 'Overview',
+  report: 'Report a Problem',
+  authorities: 'Sent to Authorities',
+  updates: 'Track Updates'
+};
+
+let reportCounter = 1043;
+let openCount = 24;
+let selectedCat = { emoji: '🕳', label: 'Roads' };
+
+function showPage(id, navEl) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  if (navEl) navEl.classList.add('active');
+  document.getElementById('topbar-title').textContent = titles[id];
+}
+
+function selectCat(btn) {
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedCat = { emoji: btn.dataset.cat, label: btn.dataset.label };
+}
+
+async function submitReport() {
+  const name     = document.getElementById('reporter-name').value.trim();
+  const contact  = document.getElementById('reporter-contact').value.trim();
+  const title    = document.getElementById('report-title').value.trim();
+  const location = document.getElementById('report-location').value.trim();
+  const details  = document.getElementById('report-details').value.trim();
+  const priority = document.getElementById('report-priority').value;
+  const errBox   = document.getElementById('report-error');
+  const btn      = document.getElementById('submit-btn');
+
+  // Client-side validation
+  if (!name || !contact || !title || !location) {
+    errBox.textContent = '⚠️ Please fill in all required fields (Name, Contact, Title, Location).';
+    errBox.style.display = 'block';
+    return;
+  }
+  errBox.style.display = 'none';
+
+  // Disable button while submitting
+  btn.textContent = 'Submitting…';
+  btn.disabled = true;
+
+  try {
+    // ── POST to Flask backend ───────────────────────────────────────────────
+    const response = await fetch('/api/report', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        full_name:      name,
+        contact:        contact,
+        category:       selectedCat.label,
+        category_emoji: selectedCat.emoji,
+        title:          title,
+        location:       location,
+        description:    details || null,
+        priority:       priority,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      // Show server validation errors
+      const msgs = result.errors ? result.errors.join(' ') : 'Submission failed. Please try again.';
+      errBox.textContent = '⚠️ ' + msgs;
+      errBox.style.display = 'block';
+      btn.textContent = 'Submit Report →';
+      btn.disabled = false;
+      return;
+    }
+
+    // ── Success: update UI from server response ─────────────────────────────
+    const c = result.data;
+    const now = new Date(c.submitted_at);
+    const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const timeStr = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    const priorityClass = ['High','Urgent'].includes(c.priority) ? 'high' : c.priority === 'Medium' ? 'medium' : 'low';
+    const fullTitle = `${c.category_emoji} ${c.title} — ${c.location}`;
+
+    // Update open count stat
+    openCount++;
+    document.getElementById('open-count').textContent = openCount;
+
+    // Add row to overview table
+    const overviewTable = document.getElementById('overview-table');
+    const newRow = document.createElement('div');
+    newRow.className = 'table-row';
+    newRow.innerHTML = `
+      <div>
+        <div class="issue-title">${fullTitle}</div>
+        <div class="issue-sub">${c.authority} · ${c.ref_number} · by ${c.full_name}</div>
+      </div>
+      <div><span class="badge pending">Submitted</span></div>
+      <div><span class="priority ${priorityClass}">● ${c.priority}</span></div>
+      <div style="font-size:12px;color:var(--muted)">${dateStr}</div>
+    `;
+    overviewTable.appendChild(newRow);
+
+    // Add card to Track Updates page
+    const updatesGrid = document.getElementById('updates-grid');
+    const card = document.createElement('div');
+    card.className = 'update-card';
+    card.style.borderColor = 'var(--accent2)';
+    card.innerHTML = `
+      <div class="update-card-header">
+        <div class="update-icon icon-blue">${c.category_emoji}</div>
+        <div>
+          <div class="update-name">${c.title} — ${c.location}</div>
+          <div class="update-date">Reported ${dateStr} · ${c.ref_number} · by ${c.full_name}</div>
+        </div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill fill-blue" style="width:${c.progress}%"></div></div>
+      <div class="progress-label"><span>${c.status}</span><span>${c.progress}%</span></div>
+      <div class="timeline">
+        ${c.timeline.map((t, i) => `
+          <div class="tl-item">
+            <div class="tl-dot ${i < c.timeline.length - 1 ? 'done' : 'active'}"></div>
+            <div class="tl-text"><strong>${t.label}</strong>${t.description ? ' — ' + t.description : ''}</div>
+          </div>`).join('')}
+        <div class="tl-item"><div class="tl-dot idle"></div><div class="tl-text">Under Review</div></div>
+        <div class="tl-item"><div class="tl-dot idle"></div><div class="tl-text">Work Scheduled</div></div>
+        <div class="tl-item"><div class="tl-dot idle"></div><div class="tl-text">Resolved</div></div>
+      </div>
+      ${c.description ? `<div style="margin-top:12px;font-size:12px;color:var(--muted);line-height:1.5;border-top:1px solid var(--border);padding-top:10px;">${c.description}</div>` : ''}
+    `;
+    updatesGrid.prepend(card);
+
+    // Success feedback
+    btn.textContent = '✅ Report Submitted!';
+    btn.style.background = '#388e3c';
+    btn.style.color = '#fff';
+
+    setTimeout(() => {
+      btn.textContent = 'Submit Report →';
+      btn.style.background = '';
+      btn.style.color = '';
+      btn.disabled = false;
+      document.getElementById('reporter-name').value = '';
+      document.getElementById('reporter-contact').value = '';
+      document.getElementById('report-title').value = '';
+      document.getElementById('report-location').value = '';
+      document.getElementById('report-details').value = '';
+      document.getElementById('report-priority').value = 'Medium';
+      document.querySelectorAll('.cat-btn').forEach((b, i) => b.classList.toggle('selected', i === 0));
+      selectedCat = { emoji: '🕳', label: 'Roads' };
+      showPage('updates', document.querySelector('[onclick*=updates]'));
+    }, 1600);
+
+  } catch (err) {
+    // Network / server unreachable
+    errBox.textContent = '⚠️ Could not reach the server. Make sure Flask is running on port 8080 (python app.py).';
+    errBox.style.display = 'block';
+    btn.textContent = 'Submit Report →';
+    btn.disabled = false;
+  }
+}
+</script>
+</body>
+</html>

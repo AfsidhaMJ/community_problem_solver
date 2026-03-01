@@ -1,0 +1,37 @@
+[
+  {
+    "id": "a1b2c3d4",
+    "ref_number": "#1000",
+
+    "full_name": "James Okafor",
+    "contact": "james@example.com",
+    "category": "Roads",
+    "category_emoji": "🕳",
+    "title": "Large pothole on Elm Street",
+    "location": "Elm Street near junction 4",
+    "description": "Large pothole approx 30cm wide. Tyre damage risk for cyclists.",
+    "priority": "High",
+
+    "authority": "Public Works",
+    "status": "Submitted",
+    "progress": 10,
+
+    "submitted_at": "2026-02-28T10:00:00.000000+00:00",
+    "updated_at":   "2026-02-28T10:00:00.000000+00:00",
+
+    "timeline": [
+      {
+        "event":       "submitted",
+        "label":       "Report Submitted",
+        "description": "Submitted by James Okafor",
+        "timestamp":   "2026-02-28T10:00:00.000000+00:00"
+      },
+      {
+        "event":       "dispatched",
+        "label":       "Sent to Public Works",
+        "description": "Automatically routed to the relevant authority",
+        "timestamp":   "2026-02-28T10:00:00.000000+00:00"
+      }
+    ]
+  }
+]
